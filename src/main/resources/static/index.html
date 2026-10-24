@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Expenzo | Advance & Expense Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Header / Navigation -->
+  <header class="app-header">
+    <div class="container header-container">
+      <div class="brand-logo" onclick="app.navigateHome()">
+        <div class="logo-icon">
+          <i class="fa-solid fa-receipt"></i>
+        </div>
+        <div class="logo-text">
+          <h1>Expenzo</h1>
+          <span class="subtext">Advance & Expense Hub</span>
+        </div>
+      </div>
+
+      <nav class="header-nav" id="headerNav">
+        <!-- Auth buttons or user session badge will render here -->
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main View Area -->
+  <main class="main-content container">
+
+    <!-- VIEW: LANDING / AUTH GATEWAY (ONLY LOGIN) -->
+    <section id="viewLanding" class="view-panel active">
+      <div class="hero-section">
+        <span class="hero-badge"><i class="fa-solid fa-shield-halved"></i> Internal Corporate Portal</span>
+        <h2>Cash Advances, Settlements & Expense Approvals</h2>
+        <p>Sign in with your corporate credentials to manage travel advances, reconcile event expenditures, or approve financial claims.</p>
+        
+        <div class="quick-stats-banner">
+          <div class="stat-pill"><i class="fa-solid fa-hand-holding-dollar text-primary"></i> Upfront Advances</div>
+          <div class="stat-pill"><i class="fa-solid fa-scale-balanced text-emerald"></i> Automated Reconciliation</div>
+          <div class="stat-pill"><i class="fa-solid fa-server text-purple"></i> Spring Boot + MySQL</div>
+        </div>
+      </div>
+
+      <div class="auth-card-container executive-auth-card">
+        <!-- Executive Portal Selector Switcher -->
+        <div class="portal-selector-bar">
+          <button class="portal-tab-btn active" data-tab="emp-login" onclick="app.switchAuthTab('emp-login')">
+            <div class="portal-tab-icon"><i class="fa-solid fa-user-tie"></i></div>
+            <div class="portal-tab-text">
+              <span class="portal-tab-title">Employee Portal</span>
+              <span class="portal-tab-subtitle">Staff & Travel Login</span>
+            </div>
+            <span class="portal-status-dot"></span>
+          </button>
+          <button class="portal-tab-btn" data-tab="admin-login" onclick="app.switchAuthTab('admin-login')">
+            <div class="portal-tab-icon portal-icon-admin"><i class="fa-solid fa-shield-halved"></i></div>
+            <div class="portal-tab-text">
+              <span class="portal-tab-title">Admin Console</span>
+              <span class="portal-tab-subtitle">Executive Command</span>
+            </div>
+            <span class="portal-status-dot admin-dot"></span>
+          </button>
+        </div>
+
+        <div class="auth-form-body executive-form-body">
+          <!-- Employee Login Form -->
+          <form id="formEmpLogin" class="auth-form active" onsubmit="app.handleEmployeeLogin(event)">
+            <div class="form-banner emp-banner">
+              <div class="banner-icon"><i class="fa-solid fa-plane-departure"></i></div>
+              <div class="banner-text">
+                <h4>Employee Travel & Expense Access</h4>
+                <p>Manage cash advances, submit bills & reconcile settlements</p>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label><i class="fa-regular fa-envelope text-primary"></i> Corporate Email Address</label>
+              <div class="input-with-icon">
+                <i class="fa-solid fa-at input-icon"></i>
+                <input type="email" id="empLoginEmail" required placeholder="name@company.com" autocomplete="email">
+              </div>
+            </div>
+            <div class="form-group">
+              <label><i class="fa-solid fa-lock text-primary"></i> Account Password</label>
+              <div class="input-with-icon password-group">
+                <i class="fa-solid fa-key input-icon"></i>
+                <input type="password" id="empLoginPassword" required placeholder="••••••••" autocomplete="current-password">
+                <button type="button" class="btn-toggle-pass" onclick="app.togglePasswordVisibility('empLoginPassword', this)">
+                  <i class="fa-regular fa-eye"></i>
+                </button>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block btn-executive">
+              <span>Sign In to Employee Portal</span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </button>
+
+            <!-- Quick Account Picker for Registered Accounts -->
+            <div class="registered-accounts-box">
+              <div class="quick-header">
+                <span class="quick-label"><i class="fa-solid fa-bolt text-amber"></i> Quick Select Pre-Registered Accounts:</span>
+                <span class="chip-badge">One-Click</span>
+              </div>
+              <div class="quick-chips" id="quickEmployeeChips">
+                <!-- Injected via JS -->
+              </div>
+            </div>
+          </form>
+
+          <!-- Admin Login Form -->
+          <form id="formAdminLogin" class="auth-form" onsubmit="app.handleAdminLogin(event)">
+            <div class="form-banner admin-banner">
+              <div class="banner-icon admin-icon"><i class="fa-solid fa-fingerprint"></i></div>
+              <div class="banner-text">
+                <h4>Executive Administration Console</h4>
+                <p>Disburse advances, audit ledger reconciliation & control staff</p>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label><i class="fa-solid fa-user-shield text-purple"></i> Administrator ID or Corporate Email</label>
+              <div class="input-with-icon">
+                <i class="fa-solid fa-user-gear input-icon text-purple"></i>
+                <input type="text" id="adminUser" required placeholder="admin@company.com" autocomplete="username">
+              </div>
+            </div>
+            <div class="form-group">
+              <label><i class="fa-solid fa-key text-purple"></i> Security Key / Password</label>
+              <div class="input-with-icon password-group">
+                <i class="fa-solid fa-lock input-icon text-purple"></i>
+                <input type="password" id="adminPass" required placeholder="••••••••" autocomplete="current-password">
+                <button type="button" class="btn-toggle-pass" onclick="app.togglePasswordVisibility('adminPass', this)">
+                  <i class="fa-regular fa-eye"></i>
+                </button>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-purple btn-block btn-executive">
+              <span>Authorize & Access Admin Console</span>
+              <i class="fa-solid fa-shield-halved"></i>
+            </button>
+
+            <div class="admin-quick-credential">
+              <div class="cred-pill" onclick="app.quickFillAdmin()">
+                <i class="fa-solid fa-key text-purple"></i>
+                <span>Use Default Manager: <code>admin@company.com</code></span>
+                <span class="cred-action">Click to fill</span>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW: EMPLOYEE DASHBOARD -->
+    <section id="viewEmployee" class="view-panel">
+      <!-- Welcome Header -->
+      <div class="dashboard-header">
+        <div>
+          <span class="badge-role badge-emp"><i class="fa-solid fa-user"></i> Employee Portal</span>
+          <h2 id="empGreeting">Welcome, Employee</h2>
+          <p class="text-muted" id="empEmailSubtitle">emp@company.com</p>
+        </div>
+        <div class="action-buttons">
+          <button class="btn btn-primary" onclick="app.openModal('modalAddExpense')">
+            <i class="fa-solid fa-receipt"></i> Submit Direct Expense
+          </button>
+          <button class="btn btn-purple" onclick="app.openModal('modalRequestAdvance')">
+            <i class="fa-solid fa-hand-holding-dollar"></i> Request Cash Advance
+          </button>
+          <button class="btn btn-emerald" onclick="app.openSettlementModal()">
+            <i class="fa-solid fa-scale-balanced"></i> Reconcile & Settle Advance
+          </button>
+        </div>
+      </div>
+
+      <!-- Employee Workflow Sub-tabs -->
+      <div class="workflow-tabs">
+        <button class="workflow-tab active" onclick="app.switchEmpTab('advances')">
+          <i class="fa-solid fa-plane-departure"></i> Cash Advances
+          <span class="badge-count" id="empTabAdvanceCount">0</span>
+        </button>
+        <button class="workflow-tab" onclick="app.switchEmpTab('settlements')">
+          <i class="fa-solid fa-scale-balanced"></i> Settlements & Reconciliation
+          <span class="badge-count" id="empTabSettlementCount">0</span>
+        </button>
+        <button class="workflow-tab" onclick="app.switchEmpTab('expenses')">
+          <i class="fa-solid fa-file-invoice-dollar"></i> Direct Reimbursements
+          <span class="badge-count" id="empTabExpenseCount">0</span>
+        </button>
+      </div>
+
+      <!-- Metrics Grid -->
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-icon bg-purple-subtle text-purple"><i class="fa-solid fa-wallet"></i></div>
+          <div class="metric-info">
+            <span class="metric-label">Active Advances</span>
+            <h3 id="empMetricActiveAdvanceAmount">₹0.00</h3>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon bg-amber-subtle text-amber"><i class="fa-solid fa-clock-rotate-left"></i></div>
+          <div class="metric-info">
+            <span class="metric-label">Pending Settlements</span>
+            <h3 id="empMetricPendingSettlements">0</h3>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon bg-emerald-subtle text-emerald"><i class="fa-solid fa-circle-check"></i></div>
+          <div class="metric-info">
+            <span class="metric-label">Approved Reimbursements</span>
+            <h3 id="empMetricApprovedAmount">₹0.00</h3>
+          </div>
+        </div>
+
+        <div class="metric-card">
+          <div class="metric-icon bg-blue-subtle text-blue"><i class="fa-solid fa-file-invoice"></i></div>
+          <div class="metric-info">
+            <span class="metric-label">Direct Claims</span>
+            <h3 id="empMetricDirectCount">0</h3>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB PANEL: EMP ADVANCES -->
+      <div id="empPanelAdvances" class="workflow-panel active">
+        <div class="panel-card mt-6">
+          <div class="panel-header">
+            <div class="panel-title">
+              <i class="fa-solid fa-hand-holding-dollar text-purple"></i>
+              <h3>My Travel & Cash Advance Requests</h3>
+            </div>
+            <button class="btn btn-purple btn-xs" onclick="app.openModal('modalRequestAdvance')">
+              <i class="fa-solid fa-plus"></i> Request Advance
+            </button>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Advance ID</th>
+                  <th>Purpose & Destination</th>
+                  <th>Request Date</th>
+                  <th>Disbursement Date</th>
+                  <th>Advance Amount</th>
+                  <th>Status</th>
+                  <th class="text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="empAdvancesTableBody">
+                <!-- Rendered via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB PANEL: EMP SETTLEMENTS -->
+      <div id="empPanelSettlements" class="workflow-panel">
+        <div class="panel-card mt-6">
+          <div class="panel-header">
+            <div class="panel-title">
+              <i class="fa-solid fa-scale-balanced text-emerald"></i>
+              <h3>Advance Settlements & Reconciliation Ledger</h3>
+            </div>
+            <button class="btn btn-emerald btn-xs" onclick="app.openSettlementModal()">
+              <i class="fa-solid fa-plus"></i> New Settlement
+            </button>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Settlement ID</th>
+                  <th>Linked Advance</th>
+                  <th>Disbursed Advance</th>
+                  <th>Approved Expenses</th>
+                  <th>Reconciliation Balance</th>
+                  <th>Outcome</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="empSettlementsTableBody">
+                <!-- Rendered via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB PANEL: EMP DIRECT EXPENSES -->
+      <div id="empPanelExpenses" class="workflow-panel">
+        <div class="panel-card mt-6">
+          <div class="panel-header">
+            <div class="panel-title">
+              <i class="fa-solid fa-table-list text-primary"></i>
+              <h3>Direct Out-of-Pocket Reimbursement Claims</h3>
+            </div>
+            <div class="table-filters">
+              <select id="empStatusFilter" onchange="app.renderEmployeeClaims()">
+                <option value="ALL">All Statuses</option>
+                <option value="PENDING">Pending</option>
+                <option value="APPROVED">Approved</option>
+                <option value="PAID">Paid</option>
+                <option value="REJECTED">Rejected</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Claim ID</th>
+                  <th>Expense Title</th>
+                  <th>Category</th>
+                  <th>Expense Date</th>
+                  <th>Amount</th>
+                  <th>Receipt</th>
+                  <th>Status</th>
+                  <th class="text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody id="empExpensesTableBody">
+                <!-- Rendered via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW: ADMIN DASHBOARD (INCLUDES REGISTRATION & STAFF MANAGEMENT) -->
+    <!-- VIEW: ADMIN DASHBOARD (EXECUTIVE COMMAND CONSOLE) -->
+    <section id="viewAdmin" class="view-panel">
+      <!-- Executive Command Topbar -->
+      <div class="executive-command-header">
+        <div class="command-brand">
+          <div class="command-badge"><i class="fa-solid fa-shield-halved"></i> MASTER CONSOLE</div>
+          <h2>Executive Command & Financial Audit</h2>
+          <p class="command-subtitle">Active Ledger Oversight • Real-time Cash Disbursements • Settlement Authorization • Staff Control</p>
+        </div>
+        
+        <div class="command-actions">
+          <div class="live-system-pill" id="systemLivePill">
+            <span class="live-pulse"></span>
+            <span id="systemLivePillText">STANDALONE (CLIENT-SIDE)</span>
+          </div>
+          <button class="btn btn-emerald btn-command" onclick="app.openModal('modalRegisterEmployee')">
+            <i class="fa-solid fa-user-plus"></i>
+            <span>Register Employee</span>
+          </button>
+          <button class="btn btn-command-export" onclick="app.exportAllCSV()">
+            <i class="fa-solid fa-file-csv"></i>
+            <span>Export Financial Audit</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Executive KPI Command Strip -->
+      <div class="executive-kpi-grid">
+        <div class="exec-kpi-card kpi-purple" onclick="app.switchAdminTab('advances')">
+          <div class="kpi-icon-wrap"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+          <div class="kpi-details">
+            <span class="kpi-label">Pending Advances</span>
+            <div class="kpi-val-row">
+              <h3 id="adminMetricPendingAdvances">0</h3>
+              <span class="kpi-tag tag-review">Requires Review</span>
+            </div>
+          </div>
+          <div class="kpi-card-glow"></div>
+        </div>
+
+        <div class="exec-kpi-card kpi-amber" onclick="app.switchAdminTab('settlements')">
+          <div class="kpi-icon-wrap"><i class="fa-solid fa-scale-balanced"></i></div>
+          <div class="kpi-details">
+            <span class="kpi-label">Pending Settlements</span>
+            <div class="kpi-val-row">
+              <h3 id="adminMetricPendingSettlements">0</h3>
+              <span class="kpi-tag tag-audit">Audit Ledger</span>
+            </div>
+          </div>
+          <div class="kpi-card-glow"></div>
+        </div>
+
+        <div class="exec-kpi-card kpi-emerald">
+          <div class="kpi-icon-wrap"><i class="fa-solid fa-vault"></i></div>
+          <div class="kpi-details">
+            <span class="kpi-label">Total Disbursed Capital</span>
+            <div class="kpi-val-row">
+              <h3 id="adminMetricDisbursedTotal">₹0.00</h3>
+              <span class="kpi-tag tag-disbursed">Active Capital</span>
+            </div>
+          </div>
+          <div class="kpi-card-glow"></div>
+        </div>
+
+        <div class="exec-kpi-card kpi-blue" onclick="app.switchAdminTab('employees')">
+          <div class="kpi-icon-wrap"><i class="fa-solid fa-users-gear"></i></div>
+          <div class="kpi-details">
+            <span class="kpi-label">Registered Corporate Staff</span>
+            <div class="kpi-val-row">
+              <h3 id="adminMetricEmployees">0</h3>
+              <span class="kpi-tag tag-active">Active Directory</span>
+            </div>
+          </div>
+          <div class="kpi-card-glow"></div>
+        </div>
+      </div>
+
+      <!-- Executive Workflow Control Tabs -->
+      <div class="workflow-tabs executive-workflow-tabs">
+        <button class="workflow-tab active" onclick="app.switchAdminTab('advances')">
+          <i class="fa-solid fa-hand-holding-dollar"></i>
+          <span>Cash Advances Review</span>
+          <span class="badge-count" id="adminTabAdvanceCount">0</span>
+        </button>
+        <button class="workflow-tab" onclick="app.switchAdminTab('settlements')">
+          <i class="fa-solid fa-scale-balanced"></i>
+          <span>Settlement Reconciliations</span>
+          <span class="badge-count" id="adminTabSettlementCount">0</span>
+        </button>
+        <button class="workflow-tab" onclick="app.switchAdminTab('expenses')">
+          <i class="fa-solid fa-receipt"></i>
+          <span>Direct Reimbursement Claims</span>
+          <span class="badge-count" id="adminTabExpenseCount">0</span>
+        </button>
+        <button class="workflow-tab" onclick="app.switchAdminTab('employees')">
+          <i class="fa-solid fa-users-gear"></i>
+          <span>Employee Directory</span>
+          <span class="badge-count" id="adminTabEmployeeCount">0</span>
+        </button>
+      </div>
+
+      <!-- ADMIN TAB PANEL: ADVANCES -->
+      <div id="adminPanelAdvances" class="workflow-panel active">
+        <div class="panel-card mt-6">
+          <div class="panel-header">
+            <div class="panel-title">
+              <i class="fa-solid fa-hand-holding-dollar text-purple"></i>
+              <h3>All Staff Cash & Travel Advances</h3>
+            </div>
+            <div class="table-filters">
+              <select id="adminAdvanceStatusFilter" onchange="app.renderAdminAdvances()">
+                <option value="ALL">All Advance Statuses</option>
+                <option value="PENDING" selected>Pending Review</option>
+                <option value="APPROVED">Approved (Awaiting Disbursement)</option>
+                <option value="DISBURSED">Disbursed (Active)</option>
+                <option value="SETTLED">Settled</option>
+                <option value="REJECTED">Rejected</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Employee</th>
+                  <th>Purpose & Notes</th>
+                  <th>Requested Date</th>
+                  <th>Requested Amount</th>
+                  <th>Status</th>
+                  <th class="text-right">Decision</th>
+                </tr>
+              </thead>
+              <tbody id="adminAdvancesTableBody">
+                <!-- Rendered via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADMIN TAB PANEL: SETTLEMENTS -->
+      <div id="adminPanelSettlements" class="workflow-panel">
+        <div class="panel-card mt-6">
+          <div class="panel-header">
+            <div class="panel-title">
+              <i class="fa-solid fa-scale-balanced text-emerald"></i>
+              <h3>Reconciliation & Settlement Finalization</h3>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Employee</th>
+                  <th>Advance Linked</th>
+                  <th>Disbursed</th>
+                  <th>Approved Expenses</th>
+                  <th>Balance</th>
+                  <th>Outcome</th>
+                  <th>Status</th>
+                  <th class="text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="adminSettlementsTableBody">
+                <!-- Rendered via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADMIN TAB PANEL: DIRECT EXPENSES -->
+      <div id="adminPanelExpenses" class="workflow-panel">
+        <div class="panel-card mt-6">
+          <div class="panel-header">
+            <div class="panel-title">
+              <i class="fa-solid fa-receipt text-primary"></i>
+              <h3>Direct Out-of-Pocket Reimbursement Claims</h3>
+            </div>
+            <div class="table-filters">
+              <select id="adminStatusFilter" onchange="app.renderAdminClaims()">
+                <option value="ALL">All Statuses</option>
+                <option value="PENDING" selected>Pending Review</option>
+                <option value="APPROVED">Approved (Awaiting Payment)</option>
+                <option value="PAID">Paid</option>
+                <option value="REJECTED">Rejected</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Employee</th>
+                  <th>Claim Details</th>
+                  <th>Category</th>
+                  <th>Date</th>
+                  <th>Amount</th>
+                  <th>Receipt</th>
+                  <th>Status</th>
+                  <th class="text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="adminExpensesTableBody">
+                <!-- Rendered via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADMIN TAB PANEL: EMPLOYEE DIRECTORY & REGISTRATION -->
+      <div id="adminPanelEmployees" class="workflow-panel">
+        <div class="panel-card mt-6">
+          <div class="panel-header">
+            <div class="panel-title">
+              <i class="fa-solid fa-users text-blue"></i>
+              <h3>Corporate Employee Directory & Registered Accounts</h3>
+            </div>
+            <button class="btn btn-emerald btn-xs" onclick="app.openModal('modalRegisterEmployee')">
+              <i class="fa-solid fa-user-plus"></i> Add New Employee
+            </button>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Staff Name</th>
+                  <th>Corporate Email</th>
+                  <th>Role</th>
+                  <th>Department</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="adminEmployeesTableBody">
+                <!-- Rendered via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- MODAL: ADD DIRECT EXPENSE CLAIM (Personal Money Out-of-Pocket) -->
+  <div id="modalAddExpense" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-plus-circle text-primary"></i> Submit Direct Reimbursement Claim</h3>
+        <button class="btn-close" onclick="app.closeModal('modalAddExpense')">&times;</button>
+      </div>
+      <form id="formAddExpense" onsubmit="app.handleAddDirectClaim(event)">
+        <div class="modal-body">
+          <div class="form-group">
+            <label><i class="fa-solid fa-tag"></i> Title / Item Name</label>
+            <input type="text" id="expenseTitle" required placeholder="e.g. Client Dinner, Train Ticket">
+          </div>
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label><i class="fa-solid fa-folder-tree"></i> Category</label>
+              <select id="expenseCategory" required>
+                <option value="TRAVEL">Travel</option>
+                <option value="HOTEL">Hotel & Accommodation</option>
+                <option value="FOOD">Food & Meals</option>
+                <option value="CONFERENCE">Conference Registration</option>
+                <option value="LOCAL_TRANSPORT">Local Transportation</option>
+                <option value="OFFICE_SUPPLIES">Office Supplies</option>
+                <option value="OTHER">Other Business Expense</option>
+              </select>
+            </div>
+            <div class="form-group flex-1">
+              <label><i class="fa-solid fa-indian-rupee-sign"></i> Amount (₹)</label>
+              <input type="number" id="expenseAmount" step="0.01" min="0.01" required placeholder="0.00">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label><i class="fa-regular fa-calendar"></i> Expense Date</label>
+              <input type="date" id="expenseDate" required>
+            </div>
+            <div class="form-group flex-1">
+              <label><i class="fa-solid fa-store"></i> Merchant / Vendor</label>
+              <input type="text" id="expenseMerchant" placeholder="e.g. Uber, Indigo, Taj Hotel">
+            </div>
+          </div>
+          <div class="form-group">
+            <label><i class="fa-solid fa-paperclip"></i> Upload Receipt / Bill (PDF, JPG, PNG)</label>
+            <input type="file" id="expenseReceiptFile" accept=".pdf,.png,.jpg,.jpeg">
+          </div>
+          <div class="form-group">
+            <label><i class="fa-solid fa-align-left"></i> Description & Business Purpose</label>
+            <textarea id="expenseDescription" rows="3" required placeholder="Provide business justification..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="app.closeModal('modalAddExpense')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Submit Claim</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: LOG EXPENSE AGAINST ACTIVE CASH ADVANCE -->
+  <div id="modalLogAdvanceExpense" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-receipt text-purple"></i> Log Expense Against Cash Advance</h3>
+        <button class="btn-close" onclick="app.closeModal('modalLogAdvanceExpense')">&times;</button>
+      </div>
+      <form id="formLogAdvanceExpense" onsubmit="app.handleLogAdvanceExpense(event)">
+        <input type="hidden" id="logAdvanceId">
+        <div class="modal-body">
+          <div class="form-group">
+            <label><i class="fa-solid fa-briefcase"></i> Advance Purpose</label>
+            <input type="text" id="logAdvancePurposeDisplay" readonly style="background: var(--bg-subtle); font-weight: 700;">
+          </div>
+          <div class="form-group">
+            <label><i class="fa-solid fa-tag"></i> Expense Title</label>
+            <input type="text" id="logExpenseTitle" required placeholder="e.g. Flight to Bangalore, Hotel bill">
+          </div>
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label><i class="fa-solid fa-folder-tree"></i> Category</label>
+              <select id="logExpenseCategory" required>
+                <option value="TRAVEL">Travel</option>
+                <option value="HOTEL">Hotel & Accommodation</option>
+                <option value="FOOD">Food & Meals</option>
+                <option value="CONFERENCE">Conference Registration</option>
+                <option value="LOCAL_TRANSPORT">Local Transportation</option>
+                <option value="OFFICE_SUPPLIES">Office Supplies</option>
+                <option value="OTHER">Other Business Expense</option>
+              </select>
+            </div>
+            <div class="form-group flex-1">
+              <label><i class="fa-solid fa-indian-rupee-sign"></i> Amount (₹)</label>
+              <input type="number" id="logExpenseAmount" step="0.01" min="0.01" required placeholder="0.00">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label><i class="fa-regular fa-calendar"></i> Expense Date</label>
+              <input type="date" id="logExpenseDate" required>
+            </div>
+            <div class="form-group flex-1">
+              <label><i class="fa-solid fa-store"></i> Merchant / Supplier</label>
+              <input type="text" id="logExpenseMerchant" placeholder="e.g. Air India, Marriott">
+            </div>
+          </div>
+          <div class="form-group">
+            <label><i class="fa-solid fa-paperclip"></i> Upload Receipt (PDF, JPG, PNG)</label>
+            <input type="file" id="logExpenseReceiptFile" accept=".pdf,.png,.jpg,.jpeg">
+          </div>
+          <div class="form-group">
+            <label><i class="fa-solid fa-align-left"></i> Description</label>
+            <textarea id="logExpenseDescription" rows="2" placeholder="Details of this expenditure..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="app.closeModal('modalLogAdvanceExpense')">Cancel</button>
+          <button type="submit" class="btn btn-purple">Record Expense</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: REQUEST ADVANCE -->
+  <div id="modalRequestAdvance" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-hand-holding-dollar text-purple"></i> Request Travel / Cash Advance</h3>
+        <button class="btn-close" onclick="app.closeModal('modalRequestAdvance')">&times;</button>
+      </div>
+      <form id="formRequestAdvance" onsubmit="app.handleRequestAdvance(event)">
+        <div class="modal-body">
+          <div class="form-group">
+            <label><i class="fa-solid fa-briefcase"></i> Advance Purpose</label>
+            <input type="text" id="advancePurpose" required placeholder="e.g. 3-day Mumbai Tech Conference & Client Visits">
+          </div>
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label><i class="fa-solid fa-location-dot"></i> Destination (City/State)</label>
+              <input type="text" id="advanceDestination" placeholder="e.g. Mumbai, Maharashtra">
+            </div>
+            <div class="form-group flex-1">
+              <label><i class="fa-solid fa-indian-rupee-sign"></i> Requested Amount (₹)</label>
+              <input type="number" id="advanceAmount" step="0.01" min="1" required placeholder="e.g. 25000">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label><i class="fa-regular fa-calendar"></i> Estimated Start Date</label>
+              <input type="date" id="advanceStartDate">
+            </div>
+            <div class="form-group flex-1">
+              <label><i class="fa-regular fa-calendar-check"></i> Estimated End Date</label>
+              <input type="date" id="advanceEndDate">
+            </div>
+          </div>
+          <div class="form-group">
+            <label><i class="fa-regular fa-calendar-days"></i> Expected Dates & Breakdown Notes</label>
+            <textarea id="advanceNotes" rows="3" placeholder="Hotel estimate ₹15,000, Flights ₹8,000, Local Taxi ₹2,000..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="app.closeModal('modalRequestAdvance')">Cancel</button>
+          <button type="submit" class="btn btn-purple">
+            <i class="fa-solid fa-paper-plane"></i> Submit Advance Request
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: SUBMIT SETTLEMENT RECONCILIATION -->
+  <div id="modalSubmitSettlement" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-scale-balanced text-emerald"></i> Reconcile & Settle Advance</h3>
+        <button class="btn-close" onclick="app.closeModal('modalSubmitSettlement')">&times;</button>
+      </div>
+      <form id="formSubmitSettlement" onsubmit="app.handleSubmitSettlement(event)">
+        <div class="modal-body">
+          <div class="form-group">
+            <label><i class="fa-solid fa-list-check"></i> Select Active Disbursed Advance</label>
+            <select id="settlementAdvanceSelect" required onchange="app.onSettlementAdvanceChange()">
+              <!-- Options populated dynamically -->
+            </select>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label><i class="fa-solid fa-wallet"></i> Disbursed Advance</label>
+              <input type="text" id="settlementAdvanceAmountDisplay" readonly style="background: var(--bg-subtle); font-weight: 700;">
+            </div>
+            <div class="form-group flex-1">
+              <label><i class="fa-solid fa-receipt"></i> Total Approved Spends</label>
+              <input type="text" id="settlementApprovedSpendsDisplay" readonly style="background: var(--bg-subtle); font-weight: 700;">
+            </div>
+          </div>
+
+          <!-- Live Balance Preview Box -->
+          <div class="reconciliation-box" id="reconciliationPreviewBox">
+            <div class="recon-header">
+              <span class="recon-title"><i class="fa-solid fa-calculator"></i> Reconciliation Balance:</span>
+              <span class="recon-value" id="reconBalanceValue">₹0.00</span>
+            </div>
+            <p class="recon-message" id="reconBalanceMessage">Select an advance to compute settlement.</p>
+          </div>
+
+          <div class="form-group mt-3">
+            <label><i class="fa-solid fa-align-left"></i> Expense Breakdown & Audit Notes</label>
+            <textarea id="settlementNotes" rows="3" required placeholder="Itemized summary of bills and activity completion..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="app.closeModal('modalSubmitSettlement')">Cancel</button>
+          <button type="submit" class="btn btn-emerald">
+            <i class="fa-solid fa-check-double"></i> Submit for Final Audit
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: MANAGER RECORD DISBURSEMENT -->
+  <div id="modalDisburseAdvance" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-money-bill-transfer text-emerald"></i> Record Cash / Travel Advance Disbursement</h3>
+        <button class="btn-close" onclick="app.closeModal('modalDisburseAdvance')">&times;</button>
+      </div>
+      <form id="formDisburseAdvance" onsubmit="app.handleDisburseAdvance(event)">
+        <input type="hidden" id="disburseAdvanceId">
+        <div class="modal-body">
+          <div class="form-group">
+            <label><i class="fa-solid fa-user"></i> Employee</label>
+            <input type="text" id="disburseEmployeeDisplay" readonly style="background: var(--bg-subtle);">
+          </div>
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label><i class="fa-solid fa-indian-rupee-sign"></i> Disbursed Amount (₹)</label>
+              <input type="number" id="disburseAmount" step="0.01" min="0.01" required>
+            </div>
+            <div class="form-group flex-1">
+              <label><i class="fa-regular fa-calendar"></i> Disbursement Date</label>
+              <input type="date" id="disburseDate" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label><i class="fa-solid fa-receipt"></i> Payment Reference & Notes</label>
+            <input type="text" id="disburseNotes" placeholder="e.g. Bank Transfer NEFT-902194, Petty Cash Vouch #402">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="app.closeModal('modalDisburseAdvance')">Cancel</button>
+          <button type="submit" class="btn btn-emerald">Confirm Disbursement</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: REGISTER EMPLOYEE -->
+  <div id="modalRegisterEmployee" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-user-plus text-emerald"></i> Register User Account</h3>
+        <button class="btn-close" onclick="app.closeModal('modalRegisterEmployee')">&times;</button>
+      </div>
+      <form id="formRegisterEmployeeInside" onsubmit="app.handleRegisterUser(event)">
+        <div class="modal-body">
+          <div class="form-group">
+            <label><i class="fa-regular fa-id-badge"></i> Employee Full Name</label>
+            <input type="text" id="adminRegName" required placeholder="e.g. Vikram Sharma">
+          </div>
+          <div class="form-group">
+            <label><i class="fa-regular fa-envelope"></i> Official Corporate Email</label>
+            <input type="email" id="adminRegEmail" required placeholder="vikram@company.com">
+          </div>
+          <div class="form-group">
+            <label><i class="fa-solid fa-lock"></i> Password (minimum 4 characters)</label>
+            <input type="password" id="adminRegPassword" minlength="4" required placeholder="Create secure password">
+          </div>
+          <div class="form-row">
+            <div class="form-group flex-1">
+              <label><i class="fa-solid fa-building"></i> Department</label>
+              <input type="text" id="adminRegDepartment" placeholder="Engineering, Sales, etc.">
+            </div>
+            <div class="form-group flex-1">
+              <label><i class="fa-solid fa-phone"></i> Phone (Optional)</label>
+              <input type="text" id="adminRegPhone" placeholder="+91 98765 43210">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="app.closeModal('modalRegisterEmployee')">Cancel</button>
+          <button type="submit" class="btn btn-emerald">
+            <i class="fa-solid fa-check"></i> Register User Account
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="app.js"></script>
+</body>
+</html>
